@@ -1,11 +1,79 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
-  url = env("postgresql://USER:PASSWORD@HOST:PORT/DATABASE")
+  url      = env("DATABASE_URL")
+}
+
+model categories {
+  id               Int              @id @default(autoincrement())
+  name             String           @unique @db.VarChar(32)
+  icon_id          Int
+  user_id          Int
+  categories_icons categories_icons @relation(fields: [icon_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_icon_id")
+  users            users            @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_user_id")
+  transactions     transactions[]
+}
+
+model categories_icons {
+  id         Int          @id @default(autoincrement())
+  icon_name  String       @unique @db.VarChar(32)
+  categories categories[]
+}
+
+model goals {
+  id         Int      @id @default(autoincrement())
+  user_id    Int
+  date_value DateTime @db.Timestamp(6)
+  value      Int?     @default(0)
+  users      users    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_user_id")
+}
+
+model payment_methods {
+  id           Int            @id @default(autoincrement())
+  method_name  String         @unique @db.VarChar(32)
+  transactions transactions[]
+}
+
+model transaction_type {
+  id           Int            @id @default(autoincrement())
+  type_name    String         @unique @db.VarChar(32)
+  transactions transactions[]
+}
+
+model transactions {
+  id                  Int               @id @default(autoincrement())
+  user_id             Int
+  transaction_type_id Int?              @default(1)
+  categorie_id        Int?              @default(1)
+  payment_method_id   Int?              @default(1)
+  date_value          DateTime          @db.Timestamp(6)
+  value               Int?              @default(0)
+  description         String?           @db.VarChar(255)
+  categories          categories?       @relation(fields: [categorie_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_categorie_id")
+  payment_methods     payment_methods?  @relation(fields: [payment_method_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_payment_method_id")
+  transaction_type    transaction_type? @relation(fields: [transaction_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_transaction_type_id")
+  users               users             @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_user_id")
+}
+
+model users {
+  id                Int               @id @default(autoincrement())
+  name              String            @db.VarChar(255)
+  email             String            @unique @db.VarChar(255)
+  password          String            @db.VarChar(255)
+  access_level_id   Int               @default(1)
+  created_at        DateTime?         @default(now()) @db.Timestamp(6)
+  updated_at        DateTime?         @default(now()) @db.Timestamp(6)
+  categories        categories[]
+  goals             goals[]
+  transactions      transactions[]
+  user_access_level user_access_level @relation(fields: [access_level_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_user_access_level_id")
+}
+
+model user_access_level {
+  id          Int     @id @default(autoincrement())
+  description String  @db.VarChar(255)
+  users       users[]
 }

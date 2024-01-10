@@ -1,6 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
+import userRouter from "./routes/users";
 
 const app = express();
 const port = 8080;
@@ -11,7 +12,9 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use("/", (_, res) => {
+app.use("/users", userRouter);
+
+app.get("/", (_, res) => {
 	res.status(200).json({ status: "ok" });
 });
 
