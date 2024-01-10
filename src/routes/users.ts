@@ -1,23 +1,19 @@
-import express, { response } from "express";
-import validator from "validator";
-import bcrypt from "bcrypt";
-import { PrismaClient } from "@prisma/client";
-import { userController } from "../controllers/userController";
-import errorHandler from "../handlers/errorHandler";
-const prisma = new PrismaClient();
+import express, { Request, Response } from "express";
+import userController from "../controllers/userController";
+import errorHandler, { customError } from "../handlers/errorHandler";
 
 const router = express.Router();
 
-router.get("/", async (req, res) => {
-	const access_level = 4; //res.locals.access_level;
+router.get("/", async (_, res: Response) => {
+	const access_level = res.locals.access_level;
 
 	const users = await userController.getAll(access_level);
 	res.json({ data: users });
 });
 
-router.get("/:id", async (req, res) => {
+router.get("/:id", async (req: Request, res: Response) => {
 	const id = Number(req.params.id);
-	const access_level = 4; //res.locals.access_level;
+	const access_level = res.locals.access_level;
 
 	try {
 		const user = await userController.getId(id, access_level);
@@ -27,17 +23,22 @@ router.get("/:id", async (req, res) => {
 	}
 });
 
-router.post("/", async (req, res) => {
-	const access_level = 4; //res.locals.access_level;
+router.post("/", async (req: Request, res: Response) => {
+	const access_level = res.locals.access_level;
 
 	try {
 		const result = await userController.create(req, access_level);
 		res.status(201).json({ result });
 	} catch (error) {
-		if (String(error).includes("email")) {
+		if (String(error).includes("Unique constraint")) {
 			return errorHandler(
 				res,
-				String("Error: custom: 400: o e-mail informado já está em uso!")
+				String(
+					customError({
+						message: "o e-mail informado já está em uso!",
+						throwError: false,
+					})
+				)
 			);
 		}
 
@@ -45,18 +46,23 @@ router.post("/", async (req, res) => {
 	}
 });
 
-router.put("/:id", async (req, res) => {
+router.put("/:id", async (req: Request, res: Response) => {
 	const id = Number(req.params.id);
-	const access_level = 4; //res.locals.access_level;
+	const access_level = res.locals.access_level;
 
 	try {
 		const result = await userController.update(req, id, access_level);
 		res.json({ data: result });
 	} catch (error) {
-		if (String(error).includes("email")) {
+		if (String(error).includes("Unique constraint")) {
 			return errorHandler(
 				res,
-				String("Error: custom: 400: o e-mail informado já está em uso!")
+				String(
+					customError({
+						message: "o e-mail informado já está em uso!",
+						throwError: false,
+					})
+				)
 			);
 		}
 
@@ -64,9 +70,9 @@ router.put("/:id", async (req, res) => {
 	}
 });
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", async (req: Request, res: Response) => {
 	const id = Number(req.params.id);
-	const access_level = 4; //res.locals.access_level;
+	const access_level = res.locals.access_level;
 
 	try {
 		const result = await userController.delete(id, access_level);

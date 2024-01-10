@@ -1,11 +1,9 @@
-import { PrismaClient } from "@prisma/client";
-import { Request, Response } from "express";
-import validator from "validator";
-import bcrypt from "bcrypt";
+import * as controllerImports from "./index";
+import { Request } from "express";
 
-const prisma = new PrismaClient();
+const { prisma, bcrypt, customError, validator } = controllerImports;
 
-export class userController {
+export default class userController {
 	//----------------------GET-ALL
 	static async getAll(access_level: number) {
 		const showAccessLevel = access_level > 2;
@@ -32,7 +30,7 @@ export class userController {
 	//----------------------GET-ID
 	static async getId(id: number, access_level: number) {
 		if (isNaN(id) || id < 0) {
-			throw new Error("custom: 400: o id inserido é inválido!");
+			throw customError({ message: "o id inserido é inválido!" });
 		}
 
 		const showAccessLevel = access_level > 2;
@@ -50,7 +48,7 @@ export class userController {
 		});
 
 		if (user === null) {
-			throw new Error("custom: 404: usuário não encontrado!");
+			throw customError({ status: 404, message: "usuário não encontrado!" });
 		}
 
 		return user;
@@ -59,16 +57,19 @@ export class userController {
 	//----------------------CREATE
 	static async create(req: Request, access_level: number) {
 		if (access_level < 3) {
-			throw new Error(
-				"custom: 400: você não tem permissão suficiente para fazer essa requisição!"
-			);
+			throw customError({
+				status: 403,
+				message: "você não tem permissão suficiente para fazer essa requisição!",
+			});
 		}
 
 		const { name, email, password } = req.body;
 
 		const isValidEmail = validator.isEmail(email);
 		if (!isValidEmail) {
-			throw new Error("custom: 400: o e-mail informado não é valido!");
+			throw customError({
+				message: "o e-mail informado não é valido!",
+			});
 		}
 
 		// criptografia da senha
@@ -85,35 +86,43 @@ export class userController {
 	//----------------------UPDATE
 	static async update(req: Request, id: number, access_level: number) {
 		if (access_level < 3) {
-			throw new Error(
-				"custom: 400: você não tem permissão suficiente para fazer essa requisição!"
-			);
+			throw customError({
+				status: 403,
+				message: "você não tem permissão suficiente para fazer essa requisição!",
+			});
 		}
 
 		if (isNaN(id) || id < 0) {
-			throw new Error("custom: 400: o id inserido é inválido!");
+			throw customError({
+				message: "o id inserido é inválido!",
+			});
 		}
 
 		const { name, email, password, access_level_id } = req.body;
 
 		if (access_level <= access_level_id && access_level < 4) {
-			throw new Error(
-				"custom: 400: você não tem permissão suficiente para atribuir esse nível de acesso a esse usuário!"
-			);
+			throw customError({
+				status: 403,
+				message:
+					"você não tem permissão suficiente para atribuir esse nível de acesso a esse usuário!",
+			});
 		}
 
 		const user = await this.getId(id, access_level);
 
 		if (user.access_level_id >= access_level && access_level < 4) {
-			throw new Error(
-				"custom: 400: você não tem permissão para modificar esse usuário!"
-			);
+			throw customError({
+				status: 403,
+				message: "você não tem permissão para modificar esse usuário!",
+			});
 		}
 
 		if (email) {
 			const isValidEmail = validator.isEmail(email);
 			if (!isValidEmail) {
-				throw new Error("custom: 400: o e-mail informado não é valido!");
+				throw customError({
+					message: "o e-mail informado não é valido!",
+				});
 			}
 		}
 
@@ -139,21 +148,25 @@ export class userController {
 
 	static async delete(id: number, access_level: number) {
 		if (access_level < 3) {
-			throw new Error(
-				"custom: 400: você não tem permissão suficiente para fazer essa requisição!"
-			);
+			throw customError({
+				status: 403,
+				message: "você não tem permissão suficiente para fazer essa requisição!",
+			});
 		}
 
 		if (isNaN(id) || id < 0) {
-			throw new Error("custom: 400: o id inserido é inválido!");
+			throw customError({
+				message: "o id inserido é inválido!",
+			});
 		}
 
 		const user = await this.getId(id, access_level);
 
 		if (user.access_level_id >= access_level && access_level < 4) {
-			throw new Error(
-				"custom: 400: você não tem permissão para excluir esse usuário!"
-			);
+			throw customError({
+				status: 403,
+				message: "você não tem permissão para excluir esse usuário!",
+			});
 		}
 
 		const result = await prisma.users.delete({ where: { id: id } });
