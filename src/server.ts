@@ -7,6 +7,7 @@ import userRouter from "./routes/users";
 import transactionsRouter from "./routes/transactions";
 import categoryRouter from "./routes/categories";
 import categoryIconRouter from "./routes/categoriesIcons";
+import paymentMethodsRouter from "./routes/paymentMethods";
 import goalRouter from "./routes/goals";
 import auth from "./middlewares/auth";
 
@@ -25,6 +26,7 @@ app.use("/users", auth, userRouter);
 app.use("/transactions", auth, transactionsRouter);
 app.use("/categories", auth, categoryRouter);
 app.use("/categories-icons", auth, categoryIconRouter);
+app.use("/payment-methods", auth, paymentMethodsRouter);
 app.use("/goals", auth, goalRouter);
 
 app.get("/", (_, res) => {
