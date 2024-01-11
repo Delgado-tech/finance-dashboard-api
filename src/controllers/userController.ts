@@ -1,4 +1,4 @@
-import * as controllerImports from "./index";
+import * as controllerImports from "./_index";
 import { Request } from "express";
 
 const { prisma, bcrypt, customError, validator } = controllerImports;

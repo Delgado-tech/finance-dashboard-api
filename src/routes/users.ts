@@ -28,7 +28,9 @@ router.post("/", async (req: Request, res: Response) => {
 
 	try {
 		const result = await userController.create(req, access_level);
-		res.status(201).json({ result });
+		res
+			.status(201)
+			.json({ response: "usuário criado com sucesso!", data: result });
 	} catch (error) {
 		if (String(error).includes("Unique constraint")) {
 			return errorHandler(
@@ -52,7 +54,7 @@ router.put("/:id", async (req: Request, res: Response) => {
 
 	try {
 		const result = await userController.update(req, id, access_level);
-		res.json({ data: result });
+		res.json({ response: "usuário atualizado com sucesso!", data: result });
 	} catch (error) {
 		if (String(error).includes("Unique constraint")) {
 			return errorHandler(
@@ -76,7 +78,7 @@ router.delete("/:id", async (req: Request, res: Response) => {
 
 	try {
 		const result = await userController.delete(id, access_level);
-		res.json({ data: result });
+		res.json({ response: "usuário deletado com sucesso!", data: result });
 	} catch (error) {
 		errorHandler(res, String(error));
 	}

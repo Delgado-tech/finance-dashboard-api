@@ -5,6 +5,7 @@ import bearerToken from "express-bearer-token";
 import accessRouter from "./routes/access";
 import userRouter from "./routes/users";
 import categoryRouter from "./routes/categories";
+import goalRouter from "./routes/goals";
 import auth from "./middlewares/auth";
 
 const app = express();
@@ -20,6 +21,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(accessRouter);
 app.use("/users", auth, userRouter);
 app.use("/categories", auth, categoryRouter);
+app.use("/goals", auth, goalRouter);
 
 app.get("/", (_, res) => {
 	res.status(200).json({ status: "ok" });
