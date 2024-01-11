@@ -4,6 +4,7 @@ import cors from "cors";
 import bearerToken from "express-bearer-token";
 import accessRouter from "./routes/access";
 import userRouter from "./routes/users";
+import transactionsRouter from "./routes/transactions";
 import categoryRouter from "./routes/categories";
 import goalRouter from "./routes/goals";
 import auth from "./middlewares/auth";
@@ -20,6 +21,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(accessRouter);
 app.use("/users", auth, userRouter);
+app.use("/transactions", auth, transactionsRouter);
 app.use("/categories", auth, categoryRouter);
 app.use("/goals", auth, goalRouter);
 

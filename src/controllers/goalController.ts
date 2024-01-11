@@ -6,7 +6,7 @@ const { prisma, customError, fns } = controllerImports;
 export default class goalController {
 	//----------------------GET-ALL
 	static async getAll(user_id: number) {
-		const categories = await prisma.goals.findMany({
+		const goals = await prisma.goals.findMany({
 			select: {
 				id: true,
 				date_value: true,
@@ -17,7 +17,8 @@ export default class goalController {
 				user_id: user_id,
 			},
 		});
-		return categories;
+
+		return goals;
 	}
 
 	//----------------------GET-ID
@@ -25,7 +26,7 @@ export default class goalController {
 		if (isNaN(id)) {
 			throw customError({ message: "o id inserido é inválido!" });
 		}
-		const category = await prisma.goals.findFirst({
+		const goal = await prisma.goals.findFirst({
 			select: {
 				id: true,
 				date_value: true,
@@ -37,17 +38,17 @@ export default class goalController {
 				user_id: user_id,
 			},
 		});
-		if (category === null) {
+		if (goal === null) {
 			throw customError({ status: 404, message: "meta não encontrada!" });
 		}
-		return category;
+		return goal;
 	}
 
 	//----------------------CREATE
 	static async create(req: Request, user_id: number) {
 		const { value, date } = req.body;
 
-		if (typeof value !== "number") {
+		if (typeof value !== "number" || value < 0) {
 			throw customError({ message: "o valor da meta é inválido" });
 		}
 
@@ -67,9 +68,15 @@ export default class goalController {
 
 	//----------------------UPDATE
 	static async update(req: Request, id: number, user_id: number) {
+		if (isNaN(id) || id < 0) {
+			throw customError({
+				message: "o id inserido é inválido!",
+			});
+		}
+
 		const { value, date } = req.body;
 
-		if (typeof value !== "number") {
+		if (typeof value !== "number" || value < 0) {
 			throw customError({ message: "o valor da meta é inválido" });
 		}
 
@@ -93,6 +100,12 @@ export default class goalController {
 
 	//----------------------DELETE
 	static async delete(id: number, user_id: number) {
+		if (isNaN(id) || id < 0) {
+			throw customError({
+				message: "o id inserido é inválido!",
+			});
+		}
+
 		const result = await prisma.goals.delete({
 			where: {
 				id: id,

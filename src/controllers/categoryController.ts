@@ -54,7 +54,10 @@ export default class categoryController {
 	//----------------------CREATE
 	static async create(req: Request, user_id: number) {
 		const { name, icon_id } = req.body;
-		console.log(user_id);
+
+		if (typeof icon_id !== "number") {
+			throw customError({ message: "o ícone informado é inválido" });
+		}
 
 		const result = await prisma.categories.create({
 			data: { name, icon_id, user_id },
@@ -64,7 +67,17 @@ export default class categoryController {
 
 	//----------------------UPDATE
 	static async update(req: Request, id: number, user_id: number) {
+		if (isNaN(id) || id < 0) {
+			throw customError({
+				message: "o id inserido é inválido!",
+			});
+		}
+
 		const { name, icon_id } = req.body;
+
+		if (typeof icon_id !== "number") {
+			throw customError({ message: "o ícone informado é inválido" });
+		}
 
 		const result = await prisma.categories.update({
 			data: { name, icon_id, user_id },
@@ -78,6 +91,12 @@ export default class categoryController {
 
 	//----------------------DELETE
 	static async delete(id: number, user_id: number) {
+		if (isNaN(id) || id < 0) {
+			throw customError({
+				message: "o id inserido é inválido!",
+			});
+		}
+
 		const result = await prisma.categories.delete({
 			where: {
 				id: id,

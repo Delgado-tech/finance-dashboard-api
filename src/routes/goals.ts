@@ -7,8 +7,8 @@ const router = express.Router();
 router.get("/", async (_, res: Response) => {
 	const user_id = res.locals.user_id;
 
-	const categories = await goalController.getAll(user_id);
-	res.json({ data: categories });
+	const goals = await goalController.getAll(user_id);
+	res.json({ data: goals });
 });
 
 router.get("/:id", async (req: Request, res: Response) => {
@@ -16,8 +16,8 @@ router.get("/:id", async (req: Request, res: Response) => {
 	const user_id = res.locals.user_id;
 
 	try {
-		const category = await goalController.getId(id, user_id);
-		res.json({ data: category });
+		const goal = await goalController.getId(id, user_id);
+		res.json({ data: goal });
 	} catch (error) {
 		errorHandler(res, String(error));
 	}
