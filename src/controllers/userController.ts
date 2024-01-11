@@ -117,6 +117,20 @@ export default class userController {
 			});
 		}
 
+		if (user.access_level_id === 4 && access_level_id < 4) {
+			const users = await prisma.users.findMany({
+				select: { _count: true },
+				where: { access_level_id: 4 },
+			});
+
+			if (users.length <= 2) {
+				throw customError({
+					message:
+						"requisição negada, é necessário possuir ao menos um usuário de nível administrador!",
+				});
+			}
+		}
+
 		if (email) {
 			const isValidEmail = validator.isEmail(email);
 			if (!isValidEmail) {
@@ -170,7 +184,27 @@ export default class userController {
 			});
 		}
 
-		const result = await prisma.users.delete({ where: { id: id } });
+		if (user.access_level_id === 4) {
+			const users = await prisma.users.findMany({
+				select: { _count: true },
+				where: { access_level_id: 4 },
+			});
+
+			if (users.length <= 2) {
+				throw customError({
+					message:
+						"requisição negada, é necessário possuir ao menos um usuário de nível administrador!",
+				});
+			}
+		}
+
+		await prisma.transactions.deleteMany({ where: { user_id: id } }).catch();
+		await prisma.categories.deleteMany({ where: { user_id: id } }).catch();
+		await prisma.goals.deleteMany({ where: { user_id: id } }).catch();
+
+		const result = await prisma.users.delete({
+			where: { id: id },
+		});
 
 		return result;
 	}

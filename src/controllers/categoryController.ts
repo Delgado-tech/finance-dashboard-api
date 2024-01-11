@@ -91,11 +91,18 @@ export default class categoryController {
 
 	//----------------------DELETE
 	static async delete(id: number, user_id: number) {
-		if (isNaN(id) || id < 0) {
+		if (isNaN(id) || id <= 1) {
 			throw customError({
 				message: "o id inserido é inválido!",
 			});
 		}
+
+		await prisma.transactions
+			.updateMany({
+				data: { categorie_id: 1 },
+				where: { categorie_id: id },
+			})
+			.catch();
 
 		const result = await prisma.categories.delete({
 			where: {

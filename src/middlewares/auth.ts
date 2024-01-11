@@ -1,8 +1,13 @@
 import { NextFunction, Request, Response } from "express";
 import errorHandler, { customError } from "../handlers/errorHandler";
 import jwt from "jsonwebtoken";
+import userController from "../controllers/userController";
 
-export default function auth(req: Request, res: Response, next: NextFunction) {
+export default async function auth(
+	req: Request,
+	res: Response,
+	next: NextFunction
+) {
 	try {
 		const token = req.token;
 
@@ -15,13 +20,16 @@ export default function auth(req: Request, res: Response, next: NextFunction) {
 			String(process.env.JWT_SECRET)
 		) as jwt.JwtPayload;
 
-		const fullPath = req.originalUrl;
+		const user = await userController
+			.getId(decodedToken.id, decodedToken.ac)
+			.catch();
 
-		if (fullPath.startsWith("/users/")) {
-			res.locals.access_level = 4; //decodedToken.ac;
-		} else {
-			res.locals.user_id = decodedToken.id;
+		if (!user) {
+			throw new Error();
 		}
+
+		res.locals.access_level = decodedToken.ac;
+		res.locals.user_id = decodedToken.id;
 
 		next();
 	} catch {

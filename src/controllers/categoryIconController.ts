@@ -88,11 +88,18 @@ export default class goalController {
 			});
 		}
 
-		if (isNaN(id) || id < 0) {
+		if (isNaN(id) || id <= 1) {
 			throw customError({
 				message: "o id inserido é inválido!",
 			});
 		}
+
+		await prisma.categories
+			.updateMany({
+				data: { icon_id: 1 },
+				where: { icon_id: id },
+			})
+			.catch();
 
 		const result = await prisma.categories_icons.delete({
 			where: {

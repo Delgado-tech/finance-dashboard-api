@@ -80,6 +80,7 @@ router.delete("/:id", async (req: Request, res: Response) => {
 		const result = await userController.delete(id, access_level);
 		res.json({ response: "usuário deletado com sucesso!", data: result });
 	} catch (error) {
+		console.log(String(error));
 		errorHandler(res, String(error));
 	}
 });
