@@ -91,7 +91,10 @@ router.delete("/:id", async (req: Request, res: Response) => {
 
 	try {
 		const result = await paymentMethodController.delete(id, access_level);
-		res.json({ response: "ícone deletado com sucesso!", data: result });
+		res.json({
+			response: "método de pagamento deletado com sucesso!",
+			data: result,
+		});
 	} catch (error) {
 		if (String(error).includes("Record to delete does not exist")) {
 			return errorHandler(
@@ -99,7 +102,7 @@ router.delete("/:id", async (req: Request, res: Response) => {
 				String(
 					customError({
 						status: 404,
-						message: "o código do ícone informado não existe!",
+						message: "o código do método de pagamento informado não existe!",
 						throwError: false,
 					})
 				)
