@@ -75,6 +75,7 @@ router.put("/:id", async (req: Request, res: Response) => {
 				res,
 				String(
 					customError({
+						status: 404,
 						message: "o código da transação informada não consta em seus registros!",
 						throwError: false,
 					})
@@ -124,6 +125,7 @@ router.delete("/:id", async (req: Request, res: Response) => {
 				res,
 				String(
 					customError({
+						status: 404,
 						message: "o código da transação informada não consta em seus registros!",
 						throwError: false,
 					})
