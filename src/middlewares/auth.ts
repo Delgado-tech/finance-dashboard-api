@@ -15,7 +15,13 @@ export default function auth(req: Request, res: Response, next: NextFunction) {
 			String(process.env.JWT_SECRET)
 		) as jwt.JwtPayload;
 
-		res.locals.access_level = 4; //decodedToken.ac;
+		const fullPath = req.originalUrl;
+
+		if (fullPath.startsWith("/users/")) {
+			res.locals.access_level = 4; //decodedToken.ac;
+		} else {
+			res.locals.user_id = decodedToken.id;
+		}
 
 		next();
 	} catch {

@@ -146,6 +146,7 @@ export default class userController {
 		return result;
 	}
 
+	//----------------------DELETE
 	static async delete(id: number, access_level: number) {
 		if (access_level < 3) {
 			throw customError({

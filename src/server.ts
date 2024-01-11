@@ -2,8 +2,9 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import bearerToken from "express-bearer-token";
-import userRouter from "./routes/users";
 import accessRouter from "./routes/access";
+import userRouter from "./routes/users";
+import categoryRouter from "./routes/categories";
 import auth from "./middlewares/auth";
 
 const app = express();
@@ -16,8 +17,9 @@ app.use(bearerToken());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use("/users", auth, userRouter);
 app.use(accessRouter);
+app.use("/users", auth, userRouter);
+app.use("/categories", auth, categoryRouter);
 
 app.get("/", (_, res) => {
 	res.status(200).json({ status: "ok" });

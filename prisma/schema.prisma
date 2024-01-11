@@ -9,7 +9,7 @@ datasource db {
 
 model categories {
   id               Int              @id @default(autoincrement())
-  name             String           @unique @db.VarChar(32)
+  name             String           @db.VarChar(32)
   icon_id          Int
   user_id          Int
   categories_icons categories_icons @relation(fields: [icon_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_icon_id")
