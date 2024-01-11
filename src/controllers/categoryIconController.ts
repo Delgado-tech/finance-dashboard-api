@@ -94,7 +94,7 @@ export default class goalController {
 			});
 		}
 
-		const result = await prisma.goals.delete({
+		const result = await prisma.categories_icons.delete({
 			where: {
 				id: id,
 			},
